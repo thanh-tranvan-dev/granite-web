@@ -4,7 +4,7 @@ Review date: 2026-09-24
 
 ## 1. Executive Summary
 
-The site is a small, static-first Next.js App Router site with working routes, a clean production build, and clear disclosure that portfolio and article content is illustrative. The source is organized around reusable content collections and a central site configuration. The project is not ready for public launch: the business profile still contains placeholders and a localhost domain fallback, page copy targets locations that do not match the configured service area, and the image-source inventory does not cover several assets actually used. These are practical launch and local-search issues; no architectural rewrite is indicated.
+The site is a small, static-first Next.js App Router site with working routes, a clean production build, and clear disclosure that portfolio and article content is illustrative. The source is organized around reusable content collections and a central site configuration. The project is not ready for public launch: the business profile still contains placeholders and a localhost domain fallback, some illustrative portfolio entries show locations outside the configured service area, and the image-source inventory does not cover all currently used assets. These are practical launch and local-search issues; no architectural rewrite is indicated.
 
 ## 2. Validation
 
@@ -52,7 +52,7 @@ None found. Lint and build pass, and all requested route families are present.
 
 - **ID:** P1-2
 - **File:** `src/config/site.ts`, `src/data/content.ts`, `src/app/dich-vu/page.tsx`
-- **Problem:** The configured areas are SÆ¡n Háº¡, TÆ° NghÄ©a, SÆ¡n Tá»‹nh, and NghÄ©a HÃ nh (Quáº£ng NgÃ£i), but service copy says ÄÃ  Náºµng and Quáº£ng Nam, and illustrative project records contain ÄÃ  Náºµng, Quáº£ng Nam, Há»™i An, and Äiá»‡n BÃ n locations.
+- **Problem:** The configured areas are Sơn Hạ, Tư Nghĩa, Sơn Tịnh, and Nghĩa Hành (Quảng Ngãi). The service page currently says Quảng Ngãi, and four illustrative project records say Quảng Ngãi, but two still display Hội An and Điện Bàn. The project disclaimer identifies entries as illustrative, but specific displayed locations can still be read as service claims.
 - **Why it matters:** Prospective customers may infer the workshop serves places it does not, while inconsistent local business signals weaken trust and local SEO. The project records are disclosed as examples, but their displayed locations still look specific.
 - **Recommended fix:** Confirm the actual service footprint. Align service copy with the config and remove or visibly mark sample locations as fictional/reference data (or omit them) until verified.
 
@@ -60,9 +60,9 @@ None found. Lint and build pass, and all requested route families are present.
 
 - **ID:** P1-3
 - **File:** `docs/image-sources.md`, `src/data/content.ts`, `public/images/*`, `README.md`
-- **Problem:** Source documentation lists a set of Unsplash WebP files, but current `photos` values also point to `bep-da-hoa-cuong.jpg`, `ban-bep-chu-l.png` (2.43 MB), `cau-thang-da.png` (2.20 MB), `mat-tien-da-hoa-cuong.png` (2.96 MB), and `mo-da-hoa-cuong.jpg`. Those used files have no matching source/license/usage records in the table. README describes `public/images` as resized WebP photography, which does not match the current JPG/PNG assets. `Next/Image` is used, but it does not reduce the bytes of these original static files when served directly.
-- **Why it matters:** Ownership and permitted use for visible images cannot be confirmed from the documentation; large source images can increase download cost and hurt page loading, especially on mobile.
-- **Recommended fix:** Identify and document the actual source and usage rights for every image used, replace assets with owner-approved workshop photos or appropriately licensed references, and resize/re-encode large files to fit their displayed dimensions. Keep the portfolio's illustrative disclosure until real project records are verified.
+- **Problem:** `docs/image-sources.md` documents the Unsplash WebP set, while current `photos` values also use `bep-da-hoa-cuong.jpg` and `mo-da-hoa-cuong.jpg` without matching source/license/usage records. The directory still contains unused legacy PNG files (`ban-bep-chu-l.png`, `cau-thang-da.png`, `mat-tien-da-hoa-cuong.png`) alongside WebP variants; these are not referenced by current `photos` values. README describes the directory as resized WebP photography, which does not reflect the mixed formats. `Next/Image` can optimize rendered images, but the original static files remain in the repository.
+- **Why it matters:** Ownership and permitted use for all visible images cannot be confirmed from the documentation; unused legacy files also add repository weight and make the image inventory misleading.
+- **Recommended fix:** Identify and document the actual source and usage rights for every image used, replace assets with owner-approved workshop photos or appropriately licensed references, and remove unused legacy files or document why they are retained. Keep the portfolio's illustrative disclosure until real project records are verified.
 
 ## 7. P2 â€” Improvements
 
@@ -78,7 +78,7 @@ None found. Lint and build pass, and all requested route families are present.
 
 - **ID:** P2-2
 - **File:** `src/app/globals.css`
-- **Problem:** At widths up to 760px, the contact bar is fixed to the viewport bottom. The footer adds bottom padding, but there is no equivalent page-bottom clearance for the content immediately before the footer.
+- **Problem:** At widths up to 760px, the contact bar is fixed to the viewport bottom. The footer has 95px bottom padding and the bar respects the safe area, but the content immediately before the footer has no corresponding clearance; a final CTA or link can be overlapped while scrolling.
 - **Why it matters:** On short pages or when scrolling to the end, the bar can overlap links or text. Check this on 375px and 768px; the bar is not enabled at 768px because its breakpoint is 760px.
 - **Recommended fix:** Provide safe-area-aware bottom clearance for page content or otherwise ensure the final content is reachable above the fixed bar; verify the result on small screens.
 
@@ -115,11 +115,11 @@ None found. Lint and build pass, and all requested route families are present.
 | H1/headings | Generally good | Pages use a visible page heading; no systematic duplicate-H1 issue was found in source review. | Keep one clear primary H1 per page. |
 | Canonical | Partial | `metadataBase` is set but explicit canonical alternates are absent. The origin defaults to localhost. | Set the production origin and add canonical URLs if URL variants need control. |
 | Open Graph | Partial | Root Open Graph basics exist, with no explicit image and little route-specific social metadata. | Add a real, rights-cleared social image and route-specific details where useful. |
-| Sitemap | Present | Includes root pages and dynamic records; last-modified dates are generated as the current date on each request. URLs inherit configured domain, which defaults to localhost. | Set production URL. Use stable content dates only if they are maintained; do not imply edits on every request. |
+| Sitemap | Present | Includes root pages and dynamic records; `lastModified` is generated from the current date for every entry. URLs inherit configured domain, which defaults to localhost. | Set production URL. Use stable content dates only if they are maintained; do not imply edits on every request. |
 | Robots | Pass with configuration dependency | Allows all crawlers and references `/sitemap.xml`; target is wrong when default localhost origin is deployed. | Configure the canonical production URL before deployment. |
 | Structured data | Absent | No Schema.org JSON-LD or LocalBusiness data found. Business address/email still require confirmation. | After confirming NAP and service area, add only accurate LocalBusiness/Service data if useful. Avoid invented ratings/reviews. |
 | Internal links | Good baseline | Shared nav/footer, cards, CTAs, and breadcrumbs link key sections. Homepage knowledge section links only to the list. | Add reviewed article links and check all CTAs after business details are set. |
-| Images | Needs attention | Next/Image and descriptive alt text are used; actual used assets are not all in source documentation and some are multi-megabyte PNGs. | Reconcile image inventory, usage rights, responsive display sizes, and compression. |
+| Images | Needs attention | Next/Image and descriptive alt text are used; two current JPG assets are not in source documentation, and three multi-megabyte PNGs remain unused in `public/images`. | Reconcile image inventory, usage rights, responsive display sizes, and remove or document unused legacy files. |
 | Crawlability/rendering | Pass | Pages are server rendered/static generated; robots allows crawling. | Recheck deployed HTML, metadata, robots, and sitemap at the real domain. |
 
 ## 9. Mobile / UX Review
@@ -141,8 +141,8 @@ None found. Lint and build pass, and all requested route families are present.
 
 ## 11. Image Review
 
-- `public/images` contains 12 assets: six WebP files are referenced in `docs/image-sources.md`; several JPG/PNG files actually mapped in `src/data/content.ts` are not in that source table. The logo is also not documented in the image source table.
-- Three used PNGs are particularly large: `ban-bep-chu-l.png` (2,434,341 bytes), `cau-thang-da.png` (2,195,402 bytes), and `mat-tien-da-hoa-cuong.png` (2,958,614 bytes). These are served from `public` as static originals.
+- `public/images` contains 15 assets: `docs/image-sources.md` lists six unique Unsplash WebP files, of which only `granite-countertop.webp` and `marble-bathroom.webp` are referenced by the current `photos` map. Two used JPG files and the logo are not documented there. Seven files are not referenced by the current map, including three multi-megabyte PNGs: `ban-bep-chu-l.png` (2,434,341 bytes), `cau-thang-da.png` (2,195,402 bytes), and `mat-tien-da-hoa-cuong.png` (2,958,614 bytes).
+- Current content maps kitchen and memorial photos to the undocumented JPG files; the large legacy PNGs are not served through those content records. Other unused files include alternate WebP variants and stock images still listed in the source table. Verify whether any other component references them before removing them.
 - The project and service UI labels many photos as illustrative, and project details state they do not describe work by the workshop. Preserve these disclosures until actual work is verified.
 - Source documentation says its Unsplash images are used under the Unsplash License, but does not establish the source or rights of all files currently used. Confirm each file individually and update the table to match actual filenames and placements.
 - Next/Image is used with `fill` and `sizes` for major content images; card photos use shared image components. The hero is marked `priority`. Image quality/format and dimensions were not measured in-browser.
@@ -150,7 +150,7 @@ None found. Lint and build pass, and all requested route families are present.
 ## 12. Performance Review
 
 - Positive: server components/static generation by default, local image hosting, Next/Image, `sizes` on the hero and shared image component, lazy loading by default for non-priority images, and no third-party scripts found.
-- Main likely cost: large static PNGs and image filenames/docs mismatch. Next/Image behavior should be confirmed on deployed Vercel for the selected output mode.
+- Main likely concern: source/usage documentation mismatch and unused large legacy PNG files that increase repository/deployment size. Next/Image behavior should be confirmed on deployed Vercel for the selected output mode.
 - `SiteChrome.tsx` currently makes static footer/contact chrome client-marked due to a file-level directive. This is a modest optimization opportunity, not a demonstrated large bundle problem.
 - `next/font/google` loads DM Sans and Manrope at build time. The build succeeded; offline builds may require cached font assets or network availability depending on environment.
 - No runtime bundle analyzer or Core Web Vitals measurement was performed; no micro-optimization is recommended before measuring the deployed site.
@@ -164,7 +164,7 @@ None found. Lint and build pass, and all requested route families are present.
 
 ## 14. Deployment Readiness
 
-The project builds successfully and is structurally compatible with Vercel's Next.js preset. It is **not ready for a trustworthy public launch** until P1-1 through P1-3 are addressed: production NAP/domain/social/map values must be confirmed, local service-area claims aligned, and image provenance/optimization resolved. Set `NEXT_PUBLIC_SITE_URL` to the canonical production origin in Vercel. The quote form is static/demo-only and does not generate stored leads; README accurately describes that limitation.
+The project builds successfully and is structurally compatible with Vercel's Next.js preset. It is **not ready for a trustworthy public launch** until P1-1 through P1-3 are addressed: production NAP/domain/social/map values must be confirmed, illustrative sample locations should be aligned with or clearly distinguished from the real service area, and image provenance/asset inventory resolved. Set `NEXT_PUBLIC_SITE_URL` to the canonical production origin in Vercel. The quote form is static/demo-only and does not generate stored leads; README accurately describes that limitation.
 
 ## 15. Future FastAPI Readiness
 
