@@ -20,7 +20,7 @@ export default function Page() {
       </header>
       <section className="section wrap">
         <SectionTitle eyebrow="Hạng mục phổ biến" title="Xem theo loại công việc" />
-        <ProjectCards />
+        <ProjectCards prioritizeStairs />
       </section>
     </>
   );

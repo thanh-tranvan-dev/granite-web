@@ -4,7 +4,7 @@ import { services } from "@/data/content";
 export const metadata: Metadata = {
   title: "Dịch vụ thi công đá",
   description:
-    "Các dịch vụ gia công và thi công đá bếp, cầu thang, mặt tiền, lavabo tại Đà Nẵng và Quảng Nam.",
+    "Các dịch vụ gia công và thi công đá bếp, cầu thang, mặt tiền, lavabo tại Quảng Ngãi.",
 };
 export default function Page() {
   return (

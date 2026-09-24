@@ -55,7 +55,7 @@ export function Cards({
           href={`/${services.some((x) => x.slug === item.slug) ? "dich-vu" : stones.some((x) => x.slug === item.slug) ? "cac-loai-da" : "cong-trinh"}/${item.slug}`}
           key={item.slug}
         >
-          <Photo src={item.image} alt={item.title} />
+          <Photo src={item.image} alt={item.title} priority={item.slug === "cau-thang-da"} />
           <div className="card-copy">
             <h3>{item.title}</h3>
             <p>{item.desc}</p>
@@ -66,12 +66,16 @@ export function Cards({
     </div>
   );
 }
-export function ProjectCards() {
+export function ProjectCards({ prioritizeStairs = false }: { prioritizeStairs?: boolean }) {
   return (
     <div className="card-grid">
       {projects.map((item) => (
         <Link className="image-card" href={`/cong-trinh/${item.slug}`} key={item.slug}>
-          <Photo src={item.image} alt={`Ảnh minh họa ${item.title}`} />
+          <Photo
+            src={item.image}
+            alt={`Ảnh minh họa ${item.title}`}
+            priority={prioritizeStairs && item.slug === "cau-thang-da-tu-nhien"}
+          />
           <div className="card-copy">
             <span className="tag">Ảnh tham khảo</span>
             <h3>{item.title}</h3>
