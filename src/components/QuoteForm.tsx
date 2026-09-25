@@ -1,12 +1,27 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Script from "next/script";
 import { apiUrl } from "@/lib/api";
 
 export default function QuoteForm() {
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const widgetContainer = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
 
   async function submitQuote(formData: FormData) {
+    if (!siteKey) {
+      setStatus("error");
+      setStatusMessage("Biểu mẫu chưa được cấu hình xác minh. Vui lòng liên hệ qua điện thoại/Zalo.");
+      return;
+    }
+    if (!turnstileToken) {
+      setStatus("error");
+      setStatusMessage("Vui lòng hoàn tất xác minh trước khi gửi.");
+      return;
+    }
     setStatus("sending");
     setStatusMessage("");
 
@@ -19,6 +34,7 @@ export default function QuoteForm() {
       area: String(formData.get("area") || "").trim() || null,
       stone_type: String(formData.get("stone_type") || "").trim() || null,
       expected_size: String(formData.get("expected_size") || "").trim() || null,
+      turnstile_token: turnstileToken,
     };
 
     try {
@@ -50,10 +66,33 @@ export default function QuoteForm() {
             ? error.message
             : "Đã xảy ra lỗi. Vui lòng thử lại hoặc liên hệ xưởng qua điện thoại/Zalo.",
       );
+    } finally {
+      setTurnstileToken("");
+      if (widgetId.current) window.turnstile?.reset(widgetId.current);
     }
   }
 
   return (
+    <>
+    {siteKey && (
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        strategy="afterInteractive"
+        onError={() => {
+          setStatus("error");
+          setStatusMessage("Không tải được bước xác minh. Vui lòng tải lại trang và thử lại.");
+        }}
+        onReady={() => {
+          if (!widgetContainer.current || widgetId.current || !window.turnstile) return;
+          widgetId.current = window.turnstile.render(widgetContainer.current, {
+            sitekey: siteKey,
+            callback: setTurnstileToken,
+            "expired-callback": () => setTurnstileToken(""),
+            "error-callback": () => setTurnstileToken(""),
+          });
+        }}
+      />
+    )}
     <form
       id="quote-form"
       className="quote-form"
@@ -99,6 +138,8 @@ export default function QuoteForm() {
         Mô tả nhu cầu
         <textarea name="message" placeholder="Mô tả thêm hạng mục hoặc yêu cầu của bạn..." />
       </label>
+      <div ref={widgetContainer} />
+      {!siteKey && <p className="notice">Biểu mẫu chưa được cấu hình xác minh. Vui lòng liên hệ qua điện thoại/Zalo.</p>}
       <button className="button" type="submit" disabled={status === "sending"}>
         {status === "sending" ? "Đang gửi..." : "Gửi yêu cầu ↗"}
       </button>
@@ -111,6 +152,8 @@ export default function QuoteForm() {
         Thông tin sẽ được gửi tới xưởng để phản hồi yêu cầu báo giá. Vui lòng chỉ cung cấp thông tin
         cần thiết cho việc tư vấn.
       </p>
+      <p className="notice">Thông tin liên hệ được dùng để xử lý báo giá và được rà soát xóa sau 180 ngày. Bạn có thể liên hệ xưởng để yêu cầu xóa sớm hơn.</p>
     </form>
+    </>
   );
 }

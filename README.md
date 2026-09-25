@@ -22,7 +22,8 @@ npm start
 Copy `.env.example` to `.env.local` for local overrides.
 
 - `NEXT_PUBLIC_SITE_URL`: canonical site origin used for metadata, sitemap and robots (set this to the production domain before deployment).
-- `NEXT_PUBLIC_API_URL`: reserved for a future FastAPI backend; no API calls are made in Phase 1.
+- `NEXT_PUBLIC_API_URL`: HTTPS URL of the FastAPI service on Render.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`: public Cloudflare Turnstile site key for the frontend hostname.
 
 ## Project structure
 
@@ -42,8 +43,8 @@ Replace illustrative photos by updating `photos` in `src/data/content.ts`. Portf
 
 To add a service, add an entry to `services`; the service detail route is generated from its slug. Add a stone to `stones`, a portfolio item to `projects`, or an article to `articles`. Each collection generates detail routes and sitemap entries. Article content is currently plain text; expand it with checked, locally useful advice before publishing.
 
-The quote form is frontend-only and does not submit or store leads. Phase 2 can connect it to `NEXT_PUBLIC_API_URL` and the FastAPI lead endpoint after agreeing on validation, privacy and delivery behavior.
+The quote form sends leads to `POST /api/v1/leads` after Cloudflare Turnstile issues a token. The backend validates the token and stores the lead in PostgreSQL. Local development can use the test site key in `.env.example`; replace it with a production site key before deployment.
 
 ## Deployment to Vercel
 
-Import the Git repository in Vercel, use the Next.js preset and deploy. Set `NEXT_PUBLIC_SITE_URL` to the canonical production URL and optionally `NEXT_PUBLIC_API_URL` when the backend exists. Verify the deployed quote/contact links, image licenses, metadata, sitemap and real business details before public launch.
+Import the Git repository in Vercel, use the Next.js preset and deploy. Set `NEXT_PUBLIC_SITE_URL` to the canonical production URL, `NEXT_PUBLIC_API_URL` to the Render API URL, and `NEXT_PUBLIC_TURNSTILE_SITE_KEY` to the production public site key. Verify the deployed quote/contact links, image licenses, metadata, sitemap and real business details before public launch.
